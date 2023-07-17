@@ -1,5 +1,12 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { 
+  ForbiddenException, 
+  Injectable, 
+  NotFoundException, 
+  UnauthorizedException
+} 
+from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 import { Repository } from 'typeorm';
 
@@ -18,6 +25,8 @@ export class AuthService {
 
     @InjectRepository(Role)
     private readonly roleRepository : Repository<Role>,
+
+    private readonly jwtTokenService: JwtService
   ){}
 
   async login(createAuthDto: CreateAuthDto){
@@ -41,11 +50,16 @@ export class AuthService {
       //ACLARATORIA, DEBE SER ENCRIPTADO AMBAS PARTES, POR FALTA DE TIEMPO NO PUEDO HACERLO :(
       if(user.password !== password) throw new UnauthorizedException("Contrasena invalida");
 
+
+      const payload = { email : user.email, ID : user.identificacion_document }
+      const access_token = this.jwtTokenService.sign(payload);
+
       return {
         message : "Login works",
         createAuthDto,
         user,
-        role
+        role,
+        access_token
       }
     }
     catch(error){
