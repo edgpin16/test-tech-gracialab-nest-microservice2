@@ -70,4 +70,8 @@ export class AuthService {
       }
     }
   }
+
+  verifyJWT(){
+    return true;
+  }
 }
